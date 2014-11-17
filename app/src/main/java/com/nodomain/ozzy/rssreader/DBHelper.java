@@ -20,7 +20,11 @@ public class DBHelper extends SQLiteOpenHelper {
     // создаем и заполняем БД
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DB.DB_CREATE);
+        db.execSQL(RSSListTable.DB_CREATE);
+        db.execSQL(RSSFeedTable.DB_CREATE);
+
+        db.execSQL(RSSListTable.DB_INIT_YA);
+        db.execSQL(RSSListTable.DB_INIT_LENTA);
     }
 
     @Override

@@ -1,33 +1,33 @@
 package com.nodomain.ozzy.rssreader;
 
+import android.database.Cursor;
 import android.os.AsyncTask;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import java.io.InputStream;
-import java.net.HttpURLConnection;
+import android.util.Log;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 import java.net.URL;
-import java.util.Date;
+import java.util.List;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+class RetrieveFeedTask extends AsyncTask<Cursor, Void, RSSFeed> {
 
-/**
- * Created by Ozzy on 15.11.2014.
- */
-class RetrieveFeedTask extends AsyncTask<String, Void, RSSFeed> {
+    private static final String LOG_TAG = "RetrieveFeedTask";
 
     private Exception exception;
 
-    protected RSSFeed doInBackground(String... urls) {
-        try {
-            return getRssItems("http://news.yandex.ru/index.rss");
-        } catch (Exception e) {
-            this.exception = e;
-            return null;
+    protected RSSFeed doInBackground(Cursor... cursor) {
+        Cursor cur = cursor[0];
+        RSSFeed feed = new RSSFeed();
+        while(cur.moveToNext()) {
+            try {
+                 feed.add(getRssItems(cur.getString(cur.getColumnIndex(RSSListTable.COLUMN_LINK))));
+            } catch (Exception e) {
+                this.exception = e;
+                return null;
+            }
         }
+        return feed;
     }
 
     protected void onPostExecute(RSSFeed feed) {
@@ -44,59 +44,38 @@ class RetrieveFeedTask extends AsyncTask<String, Void, RSSFeed> {
             //open an URL connection make GET to the server and
             //take xml RSS data
             URL url = new URL(feedUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            //HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            InputSource inputSource = new InputSource(url.openStream());
 
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                InputStream is = conn.getInputStream();
+            // instantiate SAX parser
+            SAXParserFactory saxParserFactory = SAXParserFactory
+                    .newInstance();
+            SAXParser saxParser = saxParserFactory.newSAXParser();
 
-                DocumentBuilderFactory dbf = DocumentBuilderFactory
-                        .newInstance();
-                DocumentBuilder dBuilder = dbf.newDocumentBuilder();
+            // get the XML reader
+            XMLReader xmlReader = saxParser.getXMLReader();
 
-                //using db (Document Builder) parse xml data and assign
-                //it to Element
-                Document document = dBuilder.parse(is);
-                Element element = document.getDocumentElement();
+            // prepare and set the XML content or data handler before
+            // parsing
+            XmlContentHandler xmlContentHandler = new XmlContentHandler();
+            xmlReader.setContentHandler(xmlContentHandler);
 
-                //take rss nodes to NodeList
-                NodeList nodeList = element.getElementsByTagName("item");
+            // parse the XML input source
+            xmlReader.parse(inputSource);
 
-                if (nodeList.getLength() > 0) {
-                    for (int i = 0; i < nodeList.getLength(); i++) {
-
-                        //take each entry (corresponds to <item></item> tags in
-                        //xml data
-
-                        Element entry = (Element) nodeList.item(i);
-
-                        Element _titleE = (Element) entry.getElementsByTagName(
-                                "title").item(0);
-                        Element _descriptionE = (Element) entry
-                                .getElementsByTagName("description").item(0);
-                        Element _pubDateE = (Element) entry
-                                .getElementsByTagName("pubDate").item(0);
-                        Element _linkE = (Element) entry.getElementsByTagName(
-                                "link").item(0);
-
-                        String _title = _titleE.getFirstChild().getNodeValue();
-                        String _description = _descriptionE.getFirstChild().getNodeValue();
-                        Date _pubDate = new Date(_pubDateE.getFirstChild().getNodeValue());
-                        String _link = _linkE.getFirstChild().getNodeValue();
-
-                        //create RssItemObject and add it to the ArrayList
-                        RssItem rssItem = new RssItem(_title, _description,
-                                _pubDate, _link);
-
-
-                        rssItems.add(rssItem);
-                    }
-                }
-
+            // put the parsed data to a List
+            List<RssItem> parsedDataSet = xmlContentHandler
+                    .getParsedData();
+            rssItems.feed=parsedDataSet;
+            for(RssItem item: rssItems.feed)
+            {
+                item.setRssLink(feedUrl);
             }
+            Log.d(LOG_TAG, parsedDataSet.toString());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //Log.d(LOG_TAG, rssItems.toString());
         return rssItems;
     }
 }

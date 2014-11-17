@@ -1,12 +1,10 @@
 package com.nodomain.ozzy.rssreader;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Created by Ozzy on 15.11.2014.
- */
 public class RSSFeed {
-    public ArrayList<RssItem> feed;
+    public List<RssItem> feed;
 
     public RSSFeed()
     {
@@ -20,5 +18,10 @@ public class RSSFeed {
     public void add(RssItem item)
     {
         feed.add(item);
+    }
+    public void add(RSSFeed items)
+    {
+        for(RssItem item: items.feed)
+            feed.add(item);
     }
 }

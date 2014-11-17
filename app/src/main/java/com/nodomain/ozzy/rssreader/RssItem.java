@@ -14,16 +14,8 @@ package com.nodomain.ozzy.rssreader;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import android.util.Log;
-
-import java.util.*;
-import java.text.*;
-import java.net.*;
-import java.io.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Simple struct class to hold the data for one rss item --
@@ -32,10 +24,11 @@ import java.util.ArrayList;
 public class RssItem  {
     private CharSequence mTitle;
     private CharSequence mLink;
+    private CharSequence mRssLink;
     private Date pubDate;
     private CharSequence mDescription;
 
-    private static String LOG_TAG = "RSSItem";
+    private static final String LOG_TAG = "RSSItem";
 
     public RssItem() {
         mTitle = "";
@@ -44,10 +37,11 @@ public class RssItem  {
         mDescription = "";
     }
 
-    public RssItem(CharSequence title, CharSequence description, Date pDate, CharSequence link) {
+    public RssItem(CharSequence title, CharSequence description, Date pDate, CharSequence link, CharSequence rssLink) {
         mTitle = title;
         mLink = link;
         pubDate = pDate;
+        mRssLink = rssLink;
         mDescription = description;
     }
     public CharSequence getDescription() {
@@ -65,39 +59,31 @@ public class RssItem  {
     public CharSequence getTitle() {
         return mTitle;
     }
+    public CharSequence getRssLink() {
+        return mRssLink;
+    }
     public void setTitle(CharSequence title) {
         mTitle = title;
     }
-
     public Date getPubDate()
     {
         return pubDate;
     }
-
-// If we made this class Parcelable, the code would look like...
-//    public void writeToParcel(Parcel parcel) {
-//        parcel.writeString(mTitle.toString());
-//        parcel.writeString(mLink.toString());
-//        parcel.writeString(mDescription.toString());
-//    }
-//
-//
-//    public static Object createFromParcel(Parcel parcel) {
-//        return new RssItem(
-//                parcel.readString(),
-//                parcel.readString(),
-//                parcel.readString());
-//    }
-
-
+    public void setPubDate(Date date)
+    {
+        pubDate=date;
+    }
+    public void setRssLink(CharSequence rssLink)
+    {
+        mRssLink=rssLink;
+    }
 
     @Override
     public String toString() {
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd - hh:mm:ss");
 
-        String result = getTitle() + "  ( " + sdf.format(this.getPubDate()) + " )";
-        return result;
+        return (getTitle() + "  ( " + sdf.format(this.getPubDate()) + " )");
     }
 
 
