@@ -6,16 +6,57 @@ import android.os.Bundle;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 public class RssItemContent extends ListActivity {
 
     RSSFeedTable feed;
+    RSSListTable list;
+    RetrieveFeedTask task;
+    String RSSFeedID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         feed = new RSSFeedTable(this);
+        list = new RSSListTable(this);
+
         setContentView(R.layout.activity_main);
 
+        //TODO Добавить проверку на наличие активного интернет-подключения
+        updateLists();
+
+    }
+
+    void updateLists()
+    {
+        if(!Functions.isOnline(this)) return;
+        list.open();
+        task = new RetrieveFeedTask();
+        RSSFeedID = getIntent().getStringExtra("ID");
+        Cursor rssLst = list.getData(RSSFeedID);
+        task.execute(rssLst);
+        try {
+            saveFeed(task.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        list.close();
+    }
+
+    void saveFeed(RSSFeed rssFeed)
+    {
+        feed.open();
+        feed.delAllRec();
+        for (RssItem rss: rssFeed.feed)
+        {
+            feed.addRec(rss.getTitle().toString(), rss.getDescription().toString(),rss.getRssLink().toString());
+        }
+        feed.close();
     }
 
     @Override

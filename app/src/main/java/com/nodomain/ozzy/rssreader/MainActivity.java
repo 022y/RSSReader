@@ -1,11 +1,9 @@
 package com.nodomain.ozzy.rssreader;
-
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,10 +17,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends ListActivity {
 
@@ -37,9 +33,7 @@ public class MainActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         mContext = this;
-
         LayoutInflater inflater = (LayoutInflater) this
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final ViewGroup actionBarLayout = (ViewGroup) inflater.inflate(R.layout.main_menu, null);
@@ -49,11 +43,9 @@ public class MainActivity extends ListActivity {
         getActionBar().setDisplayShowCustomEnabled(true);
         ImageView btnAdd = (ImageView)actionBarLayout.findViewById(R.id.addRss);
         btnAdd.setOnClickListener(AddRss);
-
         rssList = new RSSListTable(this);
-        //initData();
         db = new RSSFeedTable(this);
-        updateLists(null);
+        setListView();
     }
 
 
@@ -76,50 +68,6 @@ public class MainActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void saveFeed(RSSFeed rssFeed)
-    {
-        db.open();
-        db.delAllRec();
-        for (RssItem rss: rssFeed.feed)
-        {
-            db.addRec(rss.getTitle().toString(), rss.getDescription().toString(),rss.getRssLink().toString());
-        }
-        db.close();
-        setListView();
-    }
-
-    void updateLists(String link)
-    {
-        rssList.open();
-        task = new RetrieveFeedTask();
-        Cursor rssLst;
-        if(link== null) {
-             rssLst = rssList.getAllData();
-        }
-        else {
-             rssLst = rssList.getData(link);
-        }
-        task.execute(rssLst);
-        try {
-            saveFeed(task.get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void initData()
-    {
-        rssList.open();
-        rssList.delAllRec();
-        rssList.addRec("Yandex", "http://news.yandex.ru/index.rss");
-        rssList.addRec("Lenta", "http://lenta.ru/rss");
-        //rssList.addRec("Picabu", "http://pikabu.ru/xmlfeeds.php?cmd=popular");
-        //rssList.addRec("TASS","http://tass.ru/rss/v2.xml");
-        rssList.close();
-    }
-
     void setListView()
     {
         rssList.open();
@@ -133,9 +81,7 @@ public class MainActivity extends ListActivity {
             List.add(item);
         }
         rssList.close();
-
         adapter = new RssListAdapter(this, List);
-
         // Bind to our new adapter.
         setListAdapter(adapter);
     }
@@ -169,6 +115,9 @@ public class MainActivity extends ListActivity {
                 public void onClick(View v) {
                     builderURL.append(txt1.getText());
                     builderTitle.append(txt2.getText());
+                    if (!builderURL.toString().startsWith(Constants.HTTP_SCHEME) && !builderURL.toString().startsWith(Constants.HTTPS_SCHEME)) {
+                        builderURL.insert(0,Constants.HTTP_SCHEME);
+                    }
                     Log.d(LOG_TAG, "Builder " + builderURL.toString());
                     addRss(builderTitle.toString(),builderURL.toString());
                     dialog.dismiss();
@@ -183,7 +132,6 @@ public class MainActivity extends ListActivity {
         rssList.addRec(title, link);
         rssList.close();
         setListView();
-        updateLists(link);
     }
 
 }

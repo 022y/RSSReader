@@ -55,6 +55,7 @@ public class RSSListTable {
         return mDB.query(DB_TABLE, null, null, null, null, null, null);
     }
     public Cursor getData(String id) {return mDB.query(DB_TABLE, null, RSSListTable.COLUMN_LINK+ " = ?", new String [] {id}, null, null, null);}
+    public Cursor getDataByID(String id) {return mDB.query(DB_TABLE, null, RSSListTable.COLUMN_ID+ " = ?", new String [] {id}, null, null, null);}
 
 
     public void initData()
