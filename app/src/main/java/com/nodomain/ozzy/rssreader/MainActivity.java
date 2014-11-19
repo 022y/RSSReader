@@ -23,7 +23,6 @@ import java.util.List;
 public class MainActivity extends ListActivity {
 
     private static String LOG_TAG = "MainActivity";
-    RetrieveFeedTask task;
     static RSSFeedTable db;
     static RSSListTable rssList;
     RssListAdapter adapter;
@@ -47,7 +46,6 @@ public class MainActivity extends ListActivity {
         db = new RSSFeedTable(this);
         setListView();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

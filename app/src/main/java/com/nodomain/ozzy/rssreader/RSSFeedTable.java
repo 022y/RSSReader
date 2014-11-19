@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class RSSFeedTable {
-
     private static final String LOG_TAG = "RSSFeedTable";
     private static final String DB_TABLE = "RSSFeed";
     public static final String COLUMN_ID = "_id";
@@ -15,7 +14,6 @@ public class RSSFeedTable {
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_LINK = "link";
     public static final String COLUMN_RSS_LINK = "rss_link";
-
     public static final String DB_CREATE =
             "create table " + DB_TABLE + "(" +
                     COLUMN_ID + " integer primary key autoincrement, " +
@@ -26,10 +24,8 @@ public class RSSFeedTable {
                     "FOREIGN KEY("+COLUMN_RSS_LINK+") REFERENCES "+RSSListTable.DB_TABLE+"("+RSSListTable.COLUMN_LINK+")"+
                     ");";
     private final Context mCtx;
-
     private DBHelper mDBHelper;
     private SQLiteDatabase mDB;
-
     public RSSFeedTable(Context ctx) {
         mCtx = ctx;
     }
@@ -57,9 +53,7 @@ public class RSSFeedTable {
         cv.put(COLUMN_TITLE, title);
         cv.put(COLUMN_DESCRIPTION, description);
         cv.put(COLUMN_RSS_LINK,rssLink);
-
         mDB.insert(DB_TABLE, null, cv);
-
         Log.d(LOG_TAG, "RSS with title: "+title + " and description: " + description+" added!");
     }
 

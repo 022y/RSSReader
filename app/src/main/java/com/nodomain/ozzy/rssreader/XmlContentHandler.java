@@ -9,21 +9,15 @@ import java.util.Date;
 import java.util.List;
 
 public class XmlContentHandler extends DefaultHandler {
-
     private static final String LOG_TAG = "XmlContentHandler";
-
     // used to track of what tags are we
     private boolean inItem = false;
-
     // accumulate the values
     private StringBuilder mStringBuilder = new StringBuilder();
-
     // new object
     private RssItem mParsedDataSet = new RssItem();
-
     // the list of data
     private List<RssItem> mParsedDataSetList = new ArrayList<RssItem>();
-
     /*
      * Called when parsed data is requested.
      */
@@ -33,7 +27,6 @@ public class XmlContentHandler extends DefaultHandler {
     }
 
     // Methods below are built in, we just have to do the tweaks.
-
     /*
      * @Receive notification of the start of an element.
      *
@@ -42,7 +35,6 @@ public class XmlContentHandler extends DefaultHandler {
     @Override
     public void startElement(String namespaceURI, String localName,
                              String qName, Attributes atts) throws SAXException {
-
         if (localName.equals("item")) {
             // meaning new data object will be made
             this.mParsedDataSet = new RssItem();
@@ -58,26 +50,21 @@ public class XmlContentHandler extends DefaultHandler {
     @Override
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException {
-
         // Item
         if (this.inItem && localName.equals("item")) {
             this.mParsedDataSetList.add(mParsedDataSet);
             //mParsedDataSet.setParentTag("Owners");
             this.inItem = false;
         }
-
         else if (this.inItem && localName.equals("title")) {
             mParsedDataSet.setTitle(mStringBuilder.toString().trim());
         }
-
         else if (this.inItem && localName.equals("description")) {
             mParsedDataSet.setDescription(mStringBuilder.toString().trim());
         }
-
         else if (this.inItem && localName.equals("pubDate")) {
             mParsedDataSet.setPubDate(new Date(mStringBuilder.toString().trim()));
         }
-
         // empty our string builder
         mStringBuilder.setLength(0);
     }

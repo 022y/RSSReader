@@ -27,7 +27,6 @@ public class RssItem  {
     private CharSequence mRssLink;
     private Date pubDate;
     private CharSequence mDescription;
-
     private static final String LOG_TAG = "RSSItem";
 
     public RssItem() {

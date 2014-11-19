@@ -6,12 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 // класс по созданию и управлению БД
 public class DBHelper extends SQLiteOpenHelper {
-
-
     public static final String DB_NAME = "RSSDB";
     public static final int DB_VERSION = 1;
-
-
     public DBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory,
                     int version) {
         super(context, name, factory, version);
