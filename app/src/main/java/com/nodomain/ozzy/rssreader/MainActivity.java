@@ -126,6 +126,7 @@ public class MainActivity extends ListActivity {
 
     void addRss(String title,String link)
     {
+        if(title.equals("")||link.equals(""))return;
         rssList.open();
         rssList.addRec(title, link);
         rssList.close();
