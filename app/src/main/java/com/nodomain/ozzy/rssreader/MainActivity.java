@@ -12,11 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +73,7 @@ public class MainActivity extends ListActivity {
     {
         rssList.open();
         Cursor cur = rssList.getAllData();
-        List<RssItem> List = new ArrayList<RssItem>();
+        final List<RssItem> List = new ArrayList<RssItem>();
         while (cur.moveToNext())
         {
             RssItem item = new RssItem();
@@ -82,6 +85,19 @@ public class MainActivity extends ListActivity {
         adapter = new RssListAdapter(this, List);
         // Bind to our new adapter.
         setListAdapter(adapter);
+        this.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                                           int arg2, long arg3) {
+                rssList.open();
+                rssList.delRecByLink(List.get(arg2).getLink().toString());
+                List.remove(arg2);
+                adapter.notifyDataSetChanged();
+                rssList.close();
+                Toast.makeText(getApplicationContext(), "RSS-channel was deleted", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
     }
 
     @Override

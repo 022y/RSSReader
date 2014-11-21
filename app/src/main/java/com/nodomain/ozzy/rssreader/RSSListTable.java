@@ -68,6 +68,12 @@ public class RSSListTable {
     public void delRec(long id) {
         mDB.delete(DB_TABLE, COLUMN_ID + " = " + id, null);
     }
+    public void delRecByTitle(String id) {
+        mDB.delete(DB_TABLE, COLUMN_TITLE + " = '" + id+"'", null);
+    }
+    public void delRecByLink(String id) {
+        mDB.delete(DB_TABLE, COLUMN_LINK + " = '" + id+"'", null);
+    }
 
 
 }
