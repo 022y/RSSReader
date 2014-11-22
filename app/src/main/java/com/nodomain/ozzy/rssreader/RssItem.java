@@ -79,9 +79,7 @@ public class RssItem  {
 
     @Override
     public String toString() {
-
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd - hh:mm:ss");
-
         return (getTitle() + "  ( " + sdf.format(this.getPubDate()) + " )");
     }
 

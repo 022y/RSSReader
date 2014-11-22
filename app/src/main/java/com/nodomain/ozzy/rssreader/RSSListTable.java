@@ -33,18 +33,15 @@ public class RSSListTable {
         mCtx = ctx;
     }
 
-    // открыть подключение
     public void open() {
         mDBHelper = new DBHelper(mCtx, DBHelper.DB_NAME, null, DBHelper.DB_VERSION);
         mDB = mDBHelper.getWritableDatabase();
     }
 
-    // закрыть подключение
     public void close() {
         if (mDBHelper!=null) mDBHelper.close();
     }
 
-    // получить все данные из таблицы DB_TABLE
     public Cursor getAllData() {
         return mDB.query(DB_TABLE, null, null, null, null, null, null);
     }
@@ -74,6 +71,4 @@ public class RSSListTable {
     public void delRecByLink(String id) {
         mDB.delete(DB_TABLE, COLUMN_LINK + " = '" + id+"'", null);
     }
-
-
 }

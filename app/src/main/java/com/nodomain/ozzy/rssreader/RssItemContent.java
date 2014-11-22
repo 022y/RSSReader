@@ -71,13 +71,12 @@ public class RssItemContent extends ListActivity {
             progressBar.setVisibility(View.GONE);
             ListAdapter adapter = new SimpleCursorAdapter(
                     RssItemContent.this, // Context.
-                    android.R.layout.two_line_list_item,  // Specify the row template to use (here, two columns bound to the two retrieved cursor
-                    cur,                                              // Pass in the cursor to bind to.
-                    new String[]{RSSFeedTable.COLUMN_TITLE, RSSFeedTable.COLUMN_DESCRIPTION},           // Array of cursor columns to bind to.
+                    android.R.layout.two_line_list_item,
+                    cur,
+                    new String[]{RSSFeedTable.COLUMN_TITLE, RSSFeedTable.COLUMN_DESCRIPTION},
                     new int[]{android.R.id.text1, android.R.id.text2},
                     SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER) {
-            };  // Parallel array of which template objects to bind to those columns.
-            // Bind to our new adapter.
+            };
             setListAdapter(adapter);
         }
 
@@ -93,24 +92,15 @@ public class RssItemContent extends ListActivity {
         public  RSSFeed getRssItems(String feedUrl) {
             RSSFeed rssItems = new RSSFeed();
             try {
-                //open an URL connection make GET to the server and
-                //take xml RSS data
                 URL url = new URL(feedUrl);
-                //HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 InputSource inputSource = new InputSource(url.openStream());
-                // instantiate SAX parser
                 SAXParserFactory saxParserFactory = SAXParserFactory
                         .newInstance();
                 SAXParser saxParser = saxParserFactory.newSAXParser();
-                // get the XML reader
                 XMLReader xmlReader = saxParser.getXMLReader();
-                // prepare and set the XML content or data handler before
-                // parsing
                 XmlContentHandler xmlContentHandler = new XmlContentHandler();
                 xmlReader.setContentHandler(xmlContentHandler);
-                // parse the XML input source
                 xmlReader.parse(inputSource);
-                // put the parsed data to a List
                 List<RssItem> parsedDataSet = xmlContentHandler
                         .getParsedData();
                 rssItems.feed = parsedDataSet;

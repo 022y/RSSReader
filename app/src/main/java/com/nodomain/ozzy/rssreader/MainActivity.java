@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,9 +58,6 @@ public class MainActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -83,18 +79,33 @@ public class MainActivity extends ListActivity {
         }
         rssList.close();
         adapter = new RssListAdapter(this, List);
-        // Bind to our new adapter.
         setListAdapter(adapter);
         this.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           int arg2, long arg3) {
-                rssList.open();
-                rssList.delRecByLink(List.get(arg2).getLink().toString());
-                List.remove(arg2);
-                adapter.notifyDataSetChanged();
-                rssList.close();
-                Toast.makeText(getApplicationContext(), "RSS-channel was deleted", Toast.LENGTH_LONG).show();
+                                           final int arg2, long arg3) {
+                final Dialog dialog = new Dialog(mContext);
+                dialog.setContentView(R.layout.remove_rss_dialog);
+                dialog.setTitle(R.string.remove_rss_title);
+                dialog.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        rssList.open();
+                        rssList.delRecByLink(List.get(arg2).getLink().toString());
+                        List.remove(arg2);
+                        adapter.notifyDataSetChanged();
+                        rssList.close();
+                        Toast.makeText(getApplicationContext(), R.string.remove_rss_toast, Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                });
+                dialog.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
                 return true;
             }
         });
@@ -103,7 +114,6 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        // Получение элемента, который был нажат
         Intent intent = new Intent(this, RssItemContent.class);
         intent.putExtra("ID",adapter.getItem(position).getLink());
         startActivity(intent);
@@ -115,14 +125,13 @@ public class MainActivity extends ListActivity {
         public void onClick (View view)
         {
             final Dialog dialog = new Dialog(mContext);
-            dialog.setTitle("Enter RSS URL");
+            dialog.setTitle(R.string.add_rss_title);
             dialog.setContentView(R.layout.add_rss_dialog);
             dialog.show();
             final StringBuilder builderURL = new StringBuilder();
             final EditText txt1 = (EditText) dialog.findViewById(R.id.rssLink);
             final StringBuilder builderTitle = new StringBuilder();
             final EditText txt2 = (EditText) dialog.findViewById(R.id.rssTitle);
-
             Button ok = (Button)dialog.findViewById(R.id.addOk);
             ok.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -132,7 +141,6 @@ public class MainActivity extends ListActivity {
                     if (!builderURL.toString().startsWith(Constants.HTTP_SCHEME) && !builderURL.toString().startsWith(Constants.HTTPS_SCHEME)) {
                         builderURL.insert(0,Constants.HTTP_SCHEME);
                     }
-                    Log.d(LOG_TAG, "Builder " + builderURL.toString());
                     addRss(builderTitle.toString(),builderURL.toString());
                     dialog.dismiss();
                 }

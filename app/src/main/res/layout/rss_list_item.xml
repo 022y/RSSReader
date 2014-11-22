@@ -21,11 +21,5 @@
         android:background="@drawable/separator_item"
         android:layout_height="3dp" />
 
-    <View
-        android:id="@+id/separator_up"
-        android:layout_below="@+id/separator_down"
-        android:layout_width="wrap_content"
-        android:background="@drawable/separator_item_down"
-        android:layout_height="3dp" />
 
 </LinearLayout>

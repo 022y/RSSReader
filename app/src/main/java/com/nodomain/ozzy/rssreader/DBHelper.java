@@ -12,7 +12,6 @@ public class DBHelper extends SQLiteOpenHelper {
                     int version) {
         super(context, name, factory, version);
     }
-
     // создаем и заполняем БД
     @Override
     public void onCreate(SQLiteDatabase db) {
